@@ -10,3 +10,32 @@
 // R0 >= 0, R1 >= 0, and R0*R1 < 32768.
 
 // Put your code here.
+
+@R1             //times = R1
+D = M
+@times
+M = D
+
+@R2             //R2 = 0
+M = 0
+
+(LOOP)
+
+@times          //if times <= 0 then goto END
+D = M
+@END
+D;JLE
+
+@times
+M = M - 1       //times--
+@R0             //R2 = R2 + R0
+D = M
+@R2
+M = M + D 
+
+@LOOP           //jmp LOOP
+0;JMP
+
+(END)
+@END
+0;JMP

@@ -12,3 +12,58 @@
 // the screen should remain fully clear as long as no key is pressed.
 
 // Put your code here.
+
+@16384          //R0 = 0x4000
+D = A
+@R0
+M = D
+@R2             //R2 point to current screen
+M = D
+@24575
+D = A
+@R1             //R1 = 0x5FFF
+M = D
+
+
+(MAIN)
+@KBD
+D = M
+@FILL
+D;JGT
+@CLEAR
+0;JMP
+
+(FILL)
+@R1
+D = M
+@R2
+D = D - M
+@MAIN
+D;JLE           //full of screen
+
+@R2
+A = M
+M = -1
+@R2
+M = M + 1
+
+@MAIN
+0;JMP
+
+(CLEAR)
+
+@R2
+D = M
+@R0
+D = D - M
+@MAIN
+D;JLE           //screen is empty
+
+@R2
+A = M
+M = 0
+@R2
+M = M - 1
+
+@MAIN
+0;JMP
