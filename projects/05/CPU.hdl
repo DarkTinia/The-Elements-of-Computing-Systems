@@ -40,4 +40,50 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
+
+    
+    Not(in = instruction[15], out = isA);
+    Not(in = isA, out = isC);
+
+    //C-code or A-Code A Register
+    And(a = isC, b = instruction[5], out = loadA);
+    Mux16(a = instruction, b = outALU, sel = loadA, out = outA);
+
+    Or(a = isA, b = loadA, out = loadA2);
+    ARegister(in = outA, load = loadA2, out = Areg, out[0..14] = addressM);
+
+    Mux16(a = Areg, b = inM, sel = instruction[12], out = AM);
+
+    //C-code M
+    And(a = isC, b = instruction[3], out = writeM);
+
+    //C-code D Register
+    And(a = isC, b = instruction[4], out = loadD);
+    DRegister(in = outALU, load = loadD, out = Dreg);
+
+
+    //comp
+    And(a = isC, b = instruction[6], out = no);
+    And(a = isC, b = instruction[7], out = f);
+    And(a = isC, b = instruction[8], out = ny);
+    And(a = isC, b = instruction[9], out = zy);
+    And(a = isC, b = instruction[10], out = nx);
+    And(a = isC, b = instruction[11], out = zx);
+
+    ALU(x = Dreg, y = AM, zx = zx, nx = nx, zy = zy, ny = ny, f = f, no = no, out = outALU, out = outM, zr = zr, ng = ng);
+    
+    
+    //jump
+    And(a = instruction[0], b = isC, out = isJGT);
+    And(a = instruction[1], b = isC, out = isJEQ);
+    And(a = instruction[2], b = isC, out = isJLT);
+    
+    And(a = isJEQ, b = zr, out = JEQ);
+    And(a = isJLT, b = ng, out = JLT);
+    Or(a = zr, b = ng, out = tr);
+    Not(in = tr, out = tr1);
+    And(a = isJGT, b = tr1, out = JGT);
+    Or(a = JEQ, b = JLT, out = Jmp1);
+    Or(a = Jmp1, b = JGT, out = Jmp2);
+    PC(in = Areg, load = Jmp2, inc = true, reset = reset, out[0..14] = pc);  
 }
